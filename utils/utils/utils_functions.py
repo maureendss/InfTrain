@@ -2,6 +2,7 @@ import json
 import argparse
 
 import torch
+
 from cpc.feature_loader import FeatureModule, loadModel
 from cpc.clustering import kMeanCluster
 
@@ -82,6 +83,7 @@ def loadLSTMLMCheckpoint(pathLSTMCheckpoint, pathData):
     """
     Load lstm_lm model from checkpoint.
     """
+    torch.cuda.current_device()
     # Set up the args Namespace
     model_args = argparse.Namespace(
         task='language_modeling',
@@ -92,7 +94,11 @@ def loadLSTMLMCheckpoint(pathLSTMCheckpoint, pathData):
 
     # Setup task
     task = tasks.setup_task(model_args)
-    
+    import inspect
+#    print(inspect.getmembers(task, lambda a:not(inspect.isroutine(a))))
+    print(task.output_dictionary[1])
+    print("task ", task)
+    print("model_args.path", model_args.path)
     # Load model
     models, _model_args = checkpoint_utils.load_model_ensemble([model_args.path], task=task)
     model = models[0]
